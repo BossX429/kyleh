@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-test-lint:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8 mypy
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ --maxfail=3 --disable-warnings -q
+
+      - name: Run flake8
+        run: |
+          flake8 security_monitor.py security_monitor_backend.py tests/
+
+      - name: Run mypy
+        run: |
+          mypy security_monitor.py security_monitor_backend.py
