@@ -1,0 +1,41 @@
+name: License allowlist
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  check-licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies (no lockfile)
+        run: npm install --no-package-lock
+
+      - name: Generate license report (production)
+        run: npx --yes license-checker-rseidelsohn@4.3.0 --production --summary --json > licenses.prod.json
+
+      - name: Generate license report (dev)
+        run: npx --yes license-checker-rseidelsohn@4.3.0 --development --summary --json > licenses.dev.json
+
+      - name: Validate licenses (production)
+        run: node scripts/check-licenses.js licenses.prod.json
+
+      - name: Validate licenses (dev)
+        run: node scripts/check-licenses.js licenses.dev.json
+
+      - name: Upload license reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-reports
+          path: |
+            licenses.prod.json
+            licenses.dev.json
