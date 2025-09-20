@@ -1,0 +1,10 @@
+v1 = Version("1.2.3")
+v2 = Version("1.2.4")
+v3 = Version("2.0.0-beta.1")
+v4 = Version("2.0.0-beta.2")
+v5 = Version("2.0.0")
+
+assert v1 < v2  # True
+assert v2 < v3  # True (normal version < pre-release of higher version)
+assert v3 < v4  # True (beta.1 < beta.2)
+assert v4 < v5  # True (pre-release < stable)
