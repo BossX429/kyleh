@@ -1,0 +1,112 @@
+# Windows user directory gitignore
+
+# Windows system folders and files
+AppData/
+Application Data/
+Cookies/
+Local Settings/
+My Documents/
+NetHood/
+PrintHood/
+Recent/
+SendTo/
+Start Menu/
+Templates/
+NTUSER.DAT*
+ntuser.dat*
+ntuser.ini
+
+# Desktop and common user folders
+Desktop/
+Documents/
+Downloads/
+Favorites/
+Links/
+Music/
+Pictures/
+Videos/
+Contacts/
+Searches/
+"Saved Games"/
+OneDrive/
+
+# Development environments and caches
+.vscode/
+.vscode-server/
+.cache/
+.config/
+.conda/
+.keras/
+.matplotlib/
+.pyenv/
+.rustup/
+.azure/
+.ghcp-appmod-java/
+.codex/
+.continue/
+.crossnote/
+.purecode/
+.qiskit/
+.redhat/
+.sonarlint/
+.vscode-grok-logs/
+.aitk/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+miniconda3/
+
+# Python history and configs
+.python_history
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# Project specific (keeping main development projects visible)
+# Uncomment specific projects you want to track:
+# !Development/
+# !security_bot/
+# !system_monitor/
+# !tests/
+
+# Configuration files (be selective about what to include)
+*.json
+*.pdf
+*.key
+
+# Common ignore patterns
+logs/
+reports/
+data/
+static/
+backup_integrity/
+history/
+pending_update/
+plugins/
+quarantine/
+config/
+go/
+
+# IDE files
+.idea/
+*.iml
+
+# Keep essential git files
+!.gitignore
+!.gitconfig
+!README.md
