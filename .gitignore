@@ -27,6 +27,7 @@ Pictures/
 Videos/
 Contacts/
 Searches/
+Saved\ Games/
 "Saved Games"/
 OneDrive/
 
@@ -62,6 +63,12 @@ miniconda3/
 # Python history and configs
 .python_history
 *.log
+.git-for-windows-updater
+
+# Python files that shouldn't be tracked
+psutil.pyi
+wmi.pyi
+"import asyncio.py"
 
 # Database files
 *.db
