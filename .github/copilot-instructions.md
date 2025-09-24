@@ -1,5 +1,25 @@
+## MCP Server Configuration Fields
+
+| Field      | Description                                 | Required | Example                      |
+|------------|---------------------------------------------|----------|------------------------------|
+| name       | Human-readable name for display in UI       | Yes      | "Filesystem Indexer"         |
+| id         | Unique identifier for the server            | Yes      | "file-system"                |
+| transport  | Connection protocol and parameters          | Yes      | { "type": "stdio", ... }     |
+
+### Technical Details and Advanced Features
+- **Automatic Discovery:** The extension parses the `mcpServers` config, establishes connections, and queries each server for available tools automatically at startup or config reload.
+- **Extensible Transport Layer:** Supports multiple transport mechanisms (stdio, SSE) and is designed for future protocols without core changes.
+- **Seamless Integration:** MCP-enabled tools appear and function like native tools in the UI. The AI can invoke them autonomously as needed.
+- **Deployment Flexibility:** Supports local processes, Docker containers, and remote HTTP services for flexible deployment.
+
+### Supported Deployment Models
+- **Local Processes:** Run directly on your machine using stdio transport.
+- **Docker Containers:** Isolated, consistent execution environments.
+- **Remote Services:** Connect to HTTP endpoints via SSE transport.
 ---
 # Copilot Coding Agent Onboarding: Security Monitor Repository
+
+> **Note:** Tools are automatically detected and made available in the sidebar with real-time status.
 
 ## Overview
 This is a cross-platform, monolithic Python 3.8+ system security monitoring and optimization tool. It monitors CPU, RAM, GPU, disk, network, and processes for anomalies, privacy risks, and performance dips. The system supports ML/AI-based anomaly detection, self-healing, user automation, and plugin extensions. Optional Tkinter UI and REST API are provided for automation and testing.
@@ -51,10 +71,31 @@ This is a cross-platform, monolithic Python 3.8+ system security monitoring and 
 - If adding new file types, directories, or automation, document their purpose and isolation strategy in this file.
 
 ## Additional Nuanced Patterns
-- Plugins must have a `get_metrics()` function and reside in `plugins/`; backend auto-loads, no manual registration.
-- ML/AI model paths/formats must not be hardcoded; use config and document changes.
-- Extend `_integrity_*` methods if monitoring new files/resources.
-- Update this file with any new API endpoints, plugin interfaces, or integration points.
+**MCP server extensibility**: Add new MCP servers by updating configuration—no code changes required. The configuration is JSON-based and supports multiple servers with stdio and SSE transport protocols. Document config changes here if integration points or patterns change.
+
+### Example MCP Server Configuration
+```json
+{
+  "mcpServers": {
+    "your-server-id": {
+      "name": "Server Name",
+      "id": "your-server-id",
+      "transport": {
+        "type": "stdio|sse",
+        // For stdio transport:
+        "command": "npx|docker|node",
+        "args": ["-y", "package-name", "--optional-flag"],
+        "env": {
+          "API_KEY": "your_api_key"
+        }
+        // For SSE transport:
+        // "url": "https://your-server.com/sse"
+      },
+      "enabled": true
+    }
+  }
+}
+```
 
 ## Integration Points
 - **API**: Flask server exposes `/metrics`, `/findings`, `/optimize`, `/plugins`, `/automation`, `/state` endpoints.
