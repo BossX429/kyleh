@@ -1,122 +1,79 @@
 ---
 # Copilot Coding Agent Onboarding: Security Monitor Repository
 
-## Repository Summary
-- **Purpose:** Python-based system security monitoring and optimization tool. Monitors CPU, RAM, GPU, disk, network, and processes for anomalies, privacy risks, and performance dips. Supports ML/AI-based anomaly detection, self-healing, user automation, and plugin extensions. Optional Tkinter UI frontend and REST API for automation/testing.
-- **Type:** Monolithic Python project (Python 3.8+), cross-platform (Windows features enhanced), with modular backend, frontend, and plugin system.
-- **Size:** Medium (dozens of source files, multiple submodules, tests, and scripts).
-- **Languages/Frameworks:** Python 3.8+, Flask (API), Tkinter (UI), scikit-learn (ML), psutil, plyer, pyttsx3, pytest, black, isort, mypy, pyright.
+## Overview
+This is a cross-platform, monolithic Python 3.8+ system security monitoring and optimization tool. It monitors CPU, RAM, GPU, disk, network, and processes for anomalies, privacy risks, and performance dips. The system supports ML/AI-based anomaly detection, self-healing, user automation, and plugin extensions. Optional Tkinter UI and REST API are provided for automation and testing.
 
-## Build, Test, and Validation Instructions
-
-### Environment Setup
-- **Python version:** 3.8+ (recommend 3.8–3.10 for best compatibility)
-- **Install dependencies:**
-  - For normal use: `python -m pip install .`
-  - For development: `python -m pip install -e .[dev]`
-  - Always use the above commands before running, building, or testing.
-- **Virtual environment:** Strongly recommended. Example:
-  - `python -m venv .venv`
-  - On Windows: `./.venv/Scripts/Activate.ps1`
-  - On Unix: `source .venv/bin/activate`
-
-### Build/Run
-- **Run with UI and backend:** `python security_monitor.py`
-- **Run CLI-only:** `python system_monitor/monitor.py` (supports `--log-file`, `--interval`, etc.)
-- **Run REST API only:** `python security_monitor_backend_api.py` (if present)
-
-### Test
-- **Run all tests:** `pytest` (tests in `tests/`)
-- **Test files:** `tests/test_security_monitor_backend.py`, `tests/test_security_monitor_frontend.py`
-- **Type check:** `mypy .` (strict, see `pyproject.toml`)
-- **Lint/format:** `black .` and `isort .` (see config in `pyproject.toml`)
-
-### Validation/CI
-- **Pre-checkin:** Always run `pytest`, `mypy .`, `black .`, and `isort .` before submitting changes.
-- **No lockfile:** Do not use pip or npm lockfiles; always install as above.
-- **Known issues:**
-  - Some features require optional dependencies (`wmi` for Windows, `plyer`, `pyttsx3`, `GPUtil`, `tkinter`).
-  - If a dependency is missing, the app will warn and disable the feature, but will not crash.
-  - If you see type errors, check that you are using Python 3.8+ and have all dev dependencies installed.
-
-## Project Layout and Architecture
-
-- **Root files:**
-  - `security_monitor.py`: Main entry, frontend/backend integration, UI logic
-  - `security_monitor_backend.py`: Backend logic, ML/AI, integrity, plugins
-  - `security_monitor_backend_api.py`: Flask API server
-  - `system_monitor/monitor.py`: Minimal CLI monitor
-  - `pyproject.toml`: Build, dependency, lint/type config
-  - `setup.ps1`: Windows setup script
-  - `README.md`: Usage and install instructions
-- **Directories:**
-  - `system_monitor/`: Core CLI monitor and versioning
-  - `SecurityBot/`: (Advanced) Security bot modules (alerting, reporting, threat detection, etc.)
-  - `tests/`: Pytest-based tests for backend/frontend
-  - `Development/`: Dev scripts, configs, and Copilot enhancer tools
-- **Plugins:** Place `.py` files with a `get_metrics()` function in a `plugins` directory (auto-loaded by backend).
-- **API:** Flask server exposes `/metrics`, `/findings`, `/optimize`, `/plugins`, `/automation`, `/state` endpoints for UI and automation.
-- **Logging:** All monitoring and findings are logged to `security_monitor.log` (configurable via CLI/UI).
-- **ML/AI:** Uses scikit-learn (IsolationForest, LinearRegression) for anomaly detection and optimization. Models are retrained and saved as `ml_optimization_model.pkl`.
-- **Self-healing:** Integrity checks and auto-restore/quarantine for monitored files (see `_integrity_*` methods).
-- **User automation:** Supports user-defined automation rules via config file (see `_load_user_automation`).
-- **Accessibility:** UI supports high-contrast mode and font scaling (see `_apply_accessibility`).
-
-## Key Validation Steps
-- Always run `python -m pip install -e .[dev]` before running tests or type checks.
-- Always run `pytest` and `mypy .` before submitting changes.
-- Always run `black .` and `isort .` to auto-format code.
-- If adding dependencies, update `pyproject.toml` and ensure no strong-copyleft licenses are introduced.
-- If changing API or data flows, keep backend and frontend in sync.
-
-## Trust These Instructions
-- Trust these instructions for build, test, and run steps. Only search the codebase if information here is incomplete or found to be in error.
-
----# Copilot Instructions for Security Monitor Codebase
-
-## Architecture Overview
-- **Monolithic Python app** with modular backend (`SecurityMonitorBackend`), frontend (`SecurityMonitorFrontend`), and legacy compatibility via `SecurityMonitor` class (see `security_monitor.py`).
-- **Backend**: Handles system/resource monitoring, ML/AI anomaly detection, self-healing, plugin loading, and exposes a Flask API (`security_monitor_backend.py`, `security_monitor_backend_api.py`).
-- **Frontend**: Optional Tkinter UI, notifications, accessibility, and privacy dashboards. Communicates with backend via HTTP (`security_monitor.py`).
-- **Plugins**: Dynamically loaded from a `plugins` directory (see `_load_plugins` methods).
-- **API**: Flask server exposes `/metrics`, `/findings`, `/optimize`, `/plugins`, `/automation`, `/state` endpoints for UI and automation.
+## Architecture & Key Components
+- **Backend** (`security_monitor_backend.py`): Core monitoring, ML/AI (IsolationForest, LinearRegression), plugin loading, integrity checks, user automation, and logging. Exposes a Flask API (`security_monitor_backend_api.py`).
+- **Frontend/UI** (`security_monitor.py`): Tkinter-based UI, accessibility features, and integration with backend via HTTP. CLI-only mode via `system_monitor/monitor.py`.
+- **Plugins**: Drop `.py` files with a `get_metrics()` function in a `plugins` directory; these are auto-loaded by the backend.
+- **SecurityBot** (`SecurityBot/`): Advanced modules for alerting, reporting, threat detection, and automation.
+- **Tests** (`tests/`): Pytest-based tests for backend and frontend.
 
 ## Developer Workflows
-- **Install**: `python -m pip install .` (dev: `python -m pip install -e .[dev]`)
-- **Run**: `python security_monitor.py` (UI+backend) or `python system_monitor/monitor.py` (CLI-only)
+- **Install dependencies**:  
+  - Normal: `python -m pip install .`  
+  - Dev: `python -m pip install -e .[dev]`  
+  - Use a virtual environment (`python -m venv .venv`)
+- **Run**:  
+  - UI+backend: `python security_monitor.py`  
+  - CLI: `python system_monitor/monitor.py` (supports `--log-file`, `--interval`, etc.)  
+  - REST API: `python security_monitor_backend_api.py`
 - **Test**: `pytest` (see `tests/`)
-- **Format**: `black .` and `isort .` (see `pyproject.toml` for config)
-- **Type check**: `mypy .` or use strict Pyright config
-- **Dependencies**: Declared in `pyproject.toml` (see `[project]` and `[project.optional-dependencies]`)
+- **Type check**: `mypy .` (strict)
+- **Format**: `black .` and `isort .` (see `pyproject.toml`)
 
-## Project Conventions
-- **Strict type checking**: Enforced via mypy/pyright (see `pyproject.toml`).
-- **Logging**: All monitoring and findings are logged to `security_monitor.log` (configurable).
-- **ML/AI**: Uses scikit-learn (IsolationForest, LinearRegression) for anomaly detection and optimization. Models are retrained periodically and persisted as `ml_optimization_model.pkl`.
+## Project Conventions & Patterns
+- **Strict type checking**: Enforced via `mypy`/`pyright` (see `pyproject.toml`).
+- **No lockfiles**: Do not use pip or npm lockfiles.
+- **Logging**: All findings/metrics to `security_monitor.log` (configurable).
+- **ML/AI**: Models retrained and saved as `ml_optimization_model.pkl`.
 - **Self-healing**: Integrity checks and auto-restore/quarantine for monitored files (see `_integrity_*` methods).
-- **User automation**: Supports user-defined automation rules via config file (see `_load_user_automation`).
+- **User automation**: Configurable via user config (see `_load_user_automation`).
 - **Accessibility**: UI supports high-contrast mode and font scaling (see `_apply_accessibility`).
+- **Windows-specific**: WMI features if `wmi` is installed; some optimizations are Windows-only.
+- **Dependencies**: All in `pyproject.toml` (see `[project]` and `[project.optional-dependencies]`).
+- **No strong-copyleft dependencies** (GPL/LGPL/AGPL) without approval.
+
+## Safety & File Protection (MANDATORY)
+- **Never** hardlock, lock out, or delete system/OS/data files or user info. All destructive actions must have explicit, multi-level safeguards and user confirmation.
+- All file operations must check paths and avoid any system, OS, or user data directories (e.g., `C:\Windows`, `/etc`, `/home`, `/Users`, or equivalents).
+- Plugins, automation, and self-healing logic must never interfere with or modify system/OS files or critical user data.
+- When creating or placing files, ensure they do not overwrite or conflict with existing files unless explicitly intended and safe. Use unique names and isolated directories where possible.
+- All destructive or modifying actions must be logged and, where possible, reversible (e.g., quarantine instead of delete).
+- If in doubt, default to non-destructive, reversible actions and require user/admin approval for any sensitive operation.
+
+## Test & Validation Best Practices
+- After any change, run `pytest` and verify all tests pass.
+- Validate that new or modified files do not interfere with each other or with existing files—test in a clean environment if possible.
+- Confirm that plugins, automation, and ML/AI features work as intended and do not cause side effects outside their intended scope.
+- If adding new file types, directories, or automation, document their purpose and isolation strategy in this file.
+
+## Additional Nuanced Patterns
+- Plugins must have a `get_metrics()` function and reside in `plugins/`; backend auto-loads, no manual registration.
+- ML/AI model paths/formats must not be hardcoded; use config and document changes.
+- Extend `_integrity_*` methods if monitoring new files/resources.
+- Update this file with any new API endpoints, plugin interfaces, or integration points.
 
 ## Integration Points
-- **Flask API**: Used by frontend/UI and for automation/testing.
-- **Plugins**: Drop Python files with a `get_metrics()` function in the plugins directory to extend monitoring.
-- **Notifications**: Uses `plyer` for desktop notifications and `pyttsx3` for speech (optional).
-- **Windows-specific**: WMI features enabled if `wmi` is installed; some optimizations are Windows-only.
-
-## Key Files/Directories
-- `security_monitor.py`: Main entry, frontend/backend integration, UI logic
-- `security_monitor_backend.py`: Backend logic, ML/AI, integrity, plugins
-- `security_monitor_backend_api.py`: Flask API server
-- `system_monitor/monitor.py`: Minimal CLI monitor
-- `tests/`: Pytest-based tests for backend/frontend
-- `pyproject.toml`: Build, dependency, lint/type config
+- **API**: Flask server exposes `/metrics`, `/findings`, `/optimize`, `/plugins`, `/automation`, `/state` endpoints.
+- **Plugins**: Place `.py` files with `get_metrics()` in `plugins/` to extend monitoring.
+- **Notifications**: Uses `plyer` (desktop) and `pyttsx3` (speech, optional).
 
 ## Examples
-- **Add a plugin**: Place a `.py` file with `get_metrics()` in the plugins dir; it will be auto-loaded.
+- **Add a plugin**: Place a `.py` file with `get_metrics()` in `plugins/`.
 - **Run with custom log file**: `python system_monitor/monitor.py --log-file mylog.txt`
 - **Test ML/AI findings**: See `tests/test_security_monitor_backend.py` and `tests/test_security_monitor_frontend.py`
 
-## Special Notes
-- **Do not add strong-copyleft dependencies** (GPL/LGPL/AGPL) without approval.
-- **Keep backend and frontend in sync** if changing API or data flows.
-- **Document new endpoints or plugin interfaces** in this file for future agents.
+## Key Files/Directories
+- `security_monitor.py`: Main entry, UI/backend integration
+- `security_monitor_backend.py`: Backend logic, ML/AI, plugins
+- `security_monitor_backend_api.py`: Flask API server
+- `system_monitor/monitor.py`: CLI monitor
+- `SecurityBot/`: Advanced security modules
+- `tests/`: Pytest-based tests
+- `pyproject.toml`: Build, dependency, lint/type config
+
+---
+**If you update API endpoints, plugin interfaces, or add new integration points, document them here for future agents.**
