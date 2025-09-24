@@ -1,3 +1,17 @@
+## Configuration Management & Rollback
+
+To ensure safe and reliable configuration changes:
+
+- **Validation:** Always validate config files (e.g., with `python -m json.tool` for JSON) before applying changes.
+- **Drift Detection:** Periodically compare current configs to version-controlled or golden configs to detect drift.
+- **Rollback:**
+  - Keep backups of previous config versions before applying changes.
+  - Use integrity/self-healing features to restore known-good configs if issues are detected.
+  - Document all config changes and rollbacks in logs for auditability.
+- **Best Practices:**
+  - Store configs in version control where possible.
+  - Automate config validation and backup in deployment scripts.
+  - Test config changes in a staging environment before production.
 ## Deployment Verification in CI/CD
 
 Integrate deployment verification to ensure all components work after deployment:
