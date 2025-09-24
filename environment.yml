@@ -1,0 +1,6 @@
+name: kyleh-env
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  # Add any other dependencies your project requires
