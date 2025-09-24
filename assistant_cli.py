@@ -14,6 +14,7 @@ Environment:
 from __future__ import annotations
 
 
+
 import argparse
 import json
 import logging
@@ -23,13 +24,20 @@ import textwrap
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Sequence, Tuple, Optional
+from typing import Iterable, List, Sequence, Tuple, Optional, Dict, Any
 
 try:
     import requests
 except ImportError:
     print("[error] The 'requests' library is required. Install it with 'pip install requests'.", file=sys.stderr)
     sys.exit(1)
+
+try:
+    from colorama import Fore, Style, init as colorama_init
+    colorama_init()
+    COLORAMA = True
+except ImportError:
+    COLORAMA = False
 
 DEFAULT_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 DEFAULT_BASE_URL: str = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
@@ -203,11 +211,32 @@ def log_interaction(question: str, answer: str, ctx: List[CodeChunk], history_pa
         logging.warning(f"Failed to log interaction: {e}")
 
 
+def load_config(config_path: Optional[str]) -> Dict[str, Any]:
+    """
+    Load configuration from a JSON file if provided.
+    """
+    if not config_path:
+        return {}
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logging.warning(f"Failed to load config file: {e}")
+        return {}
+
+def colorize(text: str, color: str) -> str:
+    if not COLORAMA:
+        return text
+    return f"{color}{text}{Style.RESET_ALL}"
+
 def run_cli() -> int:
     """
-    Main CLI entry point.
+    Main CLI entry point with config file and colored output support.
     """
-    parser = argparse.ArgumentParser(description="Copilot-style CLI assistant.")
+    parser = argparse.ArgumentParser(
+        description="Copilot-style CLI assistant for local projects.",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument("question", help="Prompt or coding question.")
     parser.add_argument(
         "--context-root",
@@ -218,16 +247,24 @@ def run_cli() -> int:
     parser.add_argument("--history", default=None, help="Path to Q/A history log file.")
     parser.add_argument("--limit", type=int, default=6, help="Number of context chunks to use.")
     parser.add_argument("--exclude", nargs="*", default=[], help="Exclude files/directories (relative to context root).")
-    parser.add_argument("--version", action="version", version="assistant_cli.py v1.1")
+    parser.add_argument("--config", default=None, help="Path to JSON config file for defaults.")
+    parser.add_argument("--version", action="version", version="assistant_cli.py v1.2")
     args = parser.parse_args()
 
-    context_root = Path(args.context_root).resolve()
+    # Load config file if provided
+    config = load_config(args.config)
+    context_root = Path(getattr(args, 'context_root', config.get('context_root', '.'))).resolve()
+    model = getattr(args, 'model', config.get('model', DEFAULT_MODEL))
+    history = getattr(args, 'history', config.get('history', None))
+    limit = getattr(args, 'limit', config.get('limit', 6))
+    exclude = getattr(args, 'exclude', config.get('exclude', []))
+
     if not context_root.exists():
         logging.error(f"Context root {context_root} does not exist.")
         return 1
 
     try:
-        chunks = collect_relevant_chunks(context_root, args.question, limit=args.limit, exclude=args.exclude)
+        chunks = collect_relevant_chunks(context_root, args.question, limit=limit, exclude=exclude)
     except Exception as e:
         logging.error(f"Failed to collect context: {e}")
         return 1
@@ -236,9 +273,14 @@ def run_cli() -> int:
         logging.warning("No relevant context found. Proceeding with question only.")
 
     messages = build_prompt(PromptContext(question=args.question, chunks=chunks))
-    answer = call_openai(messages, model=args.model)
-    print(answer)
-    log_interaction(args.question, answer, chunks, history_path=args.history)
+    answer = call_openai(messages, model=model)
+    if COLORAMA:
+        print(colorize("\n=== Copilot Assistant Response ===\n", Fore.CYAN))
+        print(colorize(answer, Fore.GREEN))
+    else:
+        print("\n=== Copilot Assistant Response ===\n")
+        print(answer)
+    log_interaction(args.question, answer, chunks, history_path=history)
     return 0
 
 
