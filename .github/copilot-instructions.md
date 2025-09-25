@@ -120,3 +120,9 @@
 - **Do not add strong-copyleft dependencies** (GPL/LGPL/AGPL) without approval.
 - **Keep backend and frontend in sync** if changing API or data flows.
 - **Document new endpoints or plugin interfaces** in this file for future agents.
+
+## .NET CLI Telemetry Notice
+
+The .NET tools collect usage data to help improve your experience. This data is collected by Microsoft and shared with the community. You can opt out of telemetry by setting the `DOTNET_CLI_TELEMETRY_OPTOUT` environment variable to `1` or `true` in your shell.
+
+Read more: https://aka.ms/dotnet-cli-telemetry
