@@ -1,38 +1,49 @@
 name: Python Package using Pylint and Pytest
-on: [push, pull_request]
+on:
+  push:
+    tags-ignore: ['*']
+    paths-ignore: ['**/*.md','**/*.png','**/*.jpg','**/*.jpeg','**/*.gif','**/*.svg','docs/**']
+  pull_request:
+    paths: ['**/*.py','pyproject.toml','requirements*.txt','.pylintrc','.github/workflows/python-ci.yml']
+  workflow_dispatch:
+concurrency:
+  group: cheap-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CHEAP_MODE: 'true'
 jobs:
   pylint_build:
     name: Pylint / build (3.11)
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - run: |
+        with: { python-version: "3.11", cache: 'pip' }
+      - name: Install deps (cheap)
+        run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f pyproject.toml ]; then pip install '.[dev]' || true; fi
-          pip install pylint pytest autopep8 ruff
-      - run: |
+          pip install pylint
+      - name: Lint tracked files
+        run: |
           files="$(git ls-files '*.py')"
-          if [ -n "$files" ]; then
-            pylint $files || true
-            autopep8 --in-place --recursive $files || true
-            ruff check . --fix || true
-            pylint $files
-          else
-            echo "No tracked .py files"
-          fi
+          if [ -z "$files" ]; then echo "No tracked .py files"; exit 0; fi
+          pylint $files
   tests:
     name: Pytest (3.11)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - run: |
+        with: { python-version: "3.11", cache: 'pip' }
+      - name: Install test deps (cheap)
+        run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f pyproject.toml ]; then pip install '.[dev]' || true; fi
           pip install pytest
-          pytest -q
+      - name: Run tests
+        run: pytest -q
