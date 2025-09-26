@@ -1,0 +1,5 @@
+# Command Log
+# This file will keep a record of all commands you give, with timestamps.
+2025-09-26  currt ojectives?
+2025-09-26  list of projects?
+
