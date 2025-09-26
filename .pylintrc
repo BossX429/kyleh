@@ -1,0 +1,13 @@
+[MASTER]
+ignore=venv,.venv,.tox,build,dist
+persistent=yes
+jobs=0
+[MESSAGES CONTROL]
+disable=
+    C0114, C0115, C0116,
+    R0903,
+    R0801
+[FORMAT]
+max-line-length=100
+[TYPECHECK]
+ignore-mixin-members=yes

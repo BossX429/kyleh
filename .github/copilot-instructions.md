@@ -126,3 +126,18 @@
 The .NET tools collect usage data to help improve your experience. This data is collected by Microsoft and shared with the community. You can opt out of telemetry by setting the `DOTNET_CLI_TELEMETRY_OPTOUT` environment variable to `1` or `true` in your shell.
 
 Read more: https://aka.ms/dotnet-cli-telemetry
+
+# Spellchecker dictionary additions for cSpell
+# Add the following words to your cSpell user or workspace dictionary to avoid false positives:
+# Tkinter, scikit, psutil, plyer, pyttsx3, pytest, isort, mypy, pyright, venv, pyproject, checkin, lockfiles, OPTOUT, mylog, Pytest
+#
+# To add these words, create or update a `.cspell.json` file in the repo root with:
+#
+# {
+#   "version": "0.2",
+#   "words": [
+#     "Tkinter", "scikit", "psutil", "plyer", "pyttsx3", "pytest", "isort", "mypy", "pyright", "venv", "pyproject", "checkin", "lockfiles", "OPTOUT", "mylog", "Pytest"
+#   ]
+# }
+#
+# This will silence cSpell warnings for these technical/project-specific terms.
