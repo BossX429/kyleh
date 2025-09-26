@@ -1,15 +1,14 @@
-name: Python Package using Pylint and Pytest
+name: Python (cheap-mode)
 on:
   push:
-    tags-ignore: ['*']
     paths-ignore: ['**/*.md','**/*.png','**/*.jpg','**/*.jpeg','**/*.gif','**/*.svg','docs/**']
   pull_request:
-    paths: ['**/*.py','pyproject.toml','requirements*.txt','.pylintrc','.github/workflows/python-ci.yml']
-  workflow_dispatch:
+    paths: ['pyproject.toml','requirements*.txt','.pylintrc','.github/workflows/python-ci.yml']
 concurrency:
   group: cheap-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
+  CI: 'true'
   CHEAP_MODE: 'true'
 jobs:
   pylint_build:
@@ -19,12 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11", cache: 'pip' }
+        with: { python-version: '3.11', cache: 'pip' }
       - name: Install deps (cheap)
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f pyproject.toml ]; then pip install '.[dev]' || true; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install pylint
       - name: Lint tracked files
         run: |
@@ -38,12 +37,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11", cache: 'pip' }
-      - name: Install test deps (cheap)
+        with: { python-version: '3.11', cache: 'pip' }
+      - name: Install deps (cheap)
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f pyproject.toml ]; then pip install '.[dev]' || true; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install pytest
       - name: Run tests
         run: pytest -q
