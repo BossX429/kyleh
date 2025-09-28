@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=/path/to/ollama/ollama serve
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Ollama Server
+Comment=Auto-start Ollama server at login

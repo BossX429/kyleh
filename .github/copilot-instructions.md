@@ -46,3 +46,10 @@
 ---
 
 **Update this file as workflows or conventions evolve.**
+
+{
+  "editor.formatOnSave": true,
+  "files.autoSave": "afterDelay",
+  "editor.tabSize": 4,
+  "editor.renderWhitespace": "all"
+}
