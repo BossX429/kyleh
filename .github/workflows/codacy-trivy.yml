@@ -1,0 +1,45 @@
+name: Codacy & Trivy checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  codacy:
+    name: Codacy analysis (container)
+    runs-on: ubuntu-latest
+    # Codacy CLI may require extra configuration to publish results. Run the analysis for feedback
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Codacy analysis (Docker image)
+        run: |
+          echo "Running Codacy analysis using the codacy-analysis-cli container"
+          docker pull codacy/codacy-analysis-cli:latest || true
+          docker run --rm -v "${{ github.workspace }}":/src codacy/codacy-analysis-cli analyze --path /src || true
+
+  trivy:
+    name: Trivy filesystem vulnerability scan
+    runs-on: ubuntu-latest
+    needs: codacy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull Trivy image
+        run: docker pull aquasec/trivy:latest
+
+      - name: Run Trivy filesystem scan (HIGH/CRITICAL)
+        run: |
+          set -o pipefail
+          echo "Scanning repository filesystem for HIGH/CRITICAL vulnerabilities with Trivy"
+          docker run --rm -v "${{ github.workspace }}":/project aquasec/trivy:latest fs --format table --severity HIGH,CRITICAL /project | tee trivy-report.txt
+
+      - name: Upload Trivy report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.txt
