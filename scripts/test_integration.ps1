@@ -1,0 +1,3 @@
+# PowerShell script to run Ollama integration tests
+Set-Location -Path "$PSScriptRoot\..\ollama"
+go test -tags=integration ./...
