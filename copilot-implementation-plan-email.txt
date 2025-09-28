@@ -1,0 +1,20 @@
+Subject: Copilot Implementation Plan & Next Steps
+
+Hi team,
+
+A new Copilot implementation plan has been added to our repository to streamline automation and collaboration. Please review the following:
+
+- **Instructions & Plan:**
+  - [copilot-instructions.md](../blob/16-wow/.github/copilot-instructions.md)
+  - [ImplementationPlan.md](../blob/16-wow/ImplementationPlan.md)
+- **GitHub Issue Template:**
+  - [copilot-implementation-plan.md](../blob/16-wow/.github/ISSUE_TEMPLATE/copilot-implementation-plan.md)
+
+**Action Items:**
+- Open a new GitHub Issue using the template above, label it appropriately, and assign as needed.
+- Reference the plan for guidance and use Copilot to accelerate implementation.
+
+Let me know if you have questions or suggestions for further optimization.
+
+Best,
+The Automation Team

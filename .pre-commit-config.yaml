@@ -12,7 +12,6 @@ repos:
     rev: v8.56.0
     hooks:
       - id: eslint
-  - repo: https://github.com/golangci/golangci-lint
-    rev: v1.56.2
-    hooks:
-      - id: golangci-lint
+  # golangci-lint hook removed temporarily: building the Go toolchain during pre-commit
+  # can fail in some environments (Go tool version mismatch). Re-enable the hook
+  # when your local environment provides a compatible Go toolchain or when using CI.
