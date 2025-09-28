@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/ollama/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/ollama/macapp/"
+    schedule:
+      interval: "weekly"
