@@ -1,0 +1,196 @@
+name: PR Risk Guard
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  mark-risky:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label risky PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) return;
+            
+            // Fetch file list
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              { owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number }
+            );
+            const changedFiles = files.length;
+            const totalChanges = files.reduce((n,f)=>n + (f.additions||0) + (f.deletions||0), 0);
+
+            // Heuristics for risk - ENHANCED patterns
+            const riskyPatterns = [
+              /^infra\//i, 
+              /^deploy\//i, 
+              /^\.github\/workflows\//i,
+              /(^|\/)(auth|security|secrets?|keys?|crypto|db|migrations?)(\/|\.|$)/i,
+              /\.(ps1|sql|yml|yaml)$/i,
+              /config\/production/i,
+              /\.env/i,
+              /password|token|api[_-]?key/i
+            ];
+            const hits = files.filter(f => riskyPatterns.some(rx => rx.test(f.filename)));
+
+            // Apply labels
+            const addLabels = [];
+            const removeLabels = [];
+
+            if (hits.length > 0) {
+              addLabels.push("needs-human-review");
+              addLabels.push("high-risk");
+            } else {
+              removeLabels.push("needs-human-review");
+              removeLabels.push("high-risk");
+            }
+
+            // Size-based candidate label - TIGHTENED thresholds
+            if (changedFiles <= 5 && totalChanges <= 200) {
+              addLabels.push("automerge-candidate");
+            } else {
+              removeLabels.push("automerge-candidate");
+            }
+            
+            // Size labels
+            if (totalChanges > 300) addLabels.push("size/large");
+            else if (totalChanges > 100) addLabels.push("size/medium");
+            else addLabels.push("size/small");
+
+            if (addLabels.length) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner, 
+                repo: context.repo.repo, 
+                issue_number: pr.number, 
+                labels: addLabels
+              });
+            }
+            
+            for (const l of removeLabels) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner, 
+                  repo: context.repo.repo, 
+                  issue_number: pr.number, 
+                  name: l
+                });
+              } catch (_) {}
+            }
+
+            // PR summary comment with risk assessment
+            const riskLevel = hits.length > 0 ? "🚨 HIGH RISK" : "✅ LOW RISK";
+            const summary = [
+              `## Automated Risk Assessment: ${riskLevel}`,
+              "",
+              `**Files changed:** ${changedFiles}`,
+              `**Total changes:** ${totalChanges} lines`,
+              `**Sensitive files:** ${hits.length}`,
+              "",
+              hits.length ? `⚠️ **Risk flags:** ${hits.length} file(s) touch sensitive paths:` : "✅ No sensitive paths detected.",
+              ...hits.slice(0, 5).map(f => `  - \`${f.filename}\``),
+              hits.length > 5 ? `  ...and ${hits.length - 5} more` : "",
+              "",
+              totalChanges <= 200 && changedFiles <= 5 && hits.length === 0 
+                ? "✨ **Auto-merge eligible** (pending CI checks)" 
+                : "👤 **Human review required**",
+              "",
+              "cc @BossX429"
+            ].filter(Boolean).join("\n");
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, 
+              repo: context.repo.repo, 
+              issue_number: pr.number, 
+              body: summary
+            });
+
+      - name: Block Public Visibility Changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) return;
+            
+            // Fetch file list
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              { owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.number }
+            );
+            
+            // Patterns that indicate making something public
+            const publicPatterns = [
+              /visibility.*public/i,
+              /"public":\s*true/i,
+              /is_private.*false/i,
+              /private.*false/i,
+              /\.github\/workflows.*pages/i,
+              /public:\s*true/i,
+              /publishConfig.*public/i
+            ];
+            
+            // Check file contents for public exposure attempts
+            let publicAttempts = [];
+            
+            for (const file of files) {
+              // Check filename
+              if (publicPatterns.some(p => p.test(file.filename))) {
+                publicAttempts.push(file.filename);
+              }
+              
+              // Check patch content
+              if (file.patch && publicPatterns.some(p => p.test(file.patch))) {
+                publicAttempts.push(file.filename);
+              }
+            }
+            
+            // If attempting to make things public, BLOCK IT
+            if (publicAttempts.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: ['🚨-BLOCKED-PUBLIC-EXPOSURE', 'needs-human-review', 'security-critical']
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: [
+                  '# 🚨 BLOCKED - Public Exposure Attempt Detected',
+                  '',
+                  '**This PR appears to make repository content public.**',
+                  '',
+                  '⛔ **Auto-merge is BLOCKED**',
+                  '⛔ **Human review is REQUIRED**',
+                  '',
+                  '## Files flagged:',
+                  ...publicAttempts.map(f => `- \`${f}\``),
+                  '',
+                  '## 🔒 Privacy Policy',
+                  '**ALL repositories and content must remain PRIVATE unless explicitly approved by @BossX429.**',
+                  '',
+                  '### Before making anything public:',
+                  '1. Get explicit written approval from @BossX429',
+                  '2. Remove all secrets, API keys, tokens',
+                  '3. Remove internal URLs, IPs, server names',
+                  '4. Remove customer/user data',
+                  '5. Check commit history for secrets',
+                  '6. Document what is being shared and why',
+                  '',
+                  '### If this is a false positive:',
+                  'Explain what these changes actually do and why they are safe.',
+                  '',
+                  '---',
+                  '**🚨 CRITICAL: Do NOT merge until @BossX429 explicitly approves making this content public.**',
+                  '',
+                  'cc @BossX429'
+                ].join('\n')
+              });
+              
+              core.setFailed('PR blocked - attempting to make content public');
+            }
