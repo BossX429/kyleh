@@ -1,0 +1,119 @@
+name: Auto-Triage PRs and Issues
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  issues:
+    types: [opened, edited]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  auto-triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Analyze and label PR/Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isPR = context.eventName === 'pull_request';
+            const item = isPR ? context.payload.pull_request : context.payload.issue;
+            const number = item.number;
+            const body = item.body || '';
+            const title = item.title || '';
+            const files = ispr ? (await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: number
+            })).data : [];
+            
+            const labels = [];
+            
+            // High-risk patterns that need human review
+            const highRiskPatterns = [
+              /breaking\s+change/i,
+              /database\s+migration/i,
+              /auth|authentication|authorization/i,
+              /security|vulnerability/i,
+              /payment|billing|financial/i,
+              /production|prod\s+config/i,
+              /api\s+key|secret|token|password/i,
+              /major\s+version/i,
+              /infrastructure|terraform|kubernetes/i
+            ];
+            
+            // Check title and body for high-risk patterns
+            const needsHuman = highRiskPatterns.some(pattern => 
+              pattern.test(title) || pattern.test(body)
+            );
+            
+            if (ispr) {
+              // Check file changes
+              const changedLines = files.reduce((sum, f) => sum + f.changes, 0);
+              const hasBreakingFiles = files.some(f => 
+                f.filename.includes('migration') ||
+                f.filename.includes('.env') ||
+                f.filename.includes('config/production') ||
+                f.filename.includes('auth') ||
+                f.filename.includes('security')
+              );
+              
+              // Label based on size
+              if (changedLines > 300) {
+                labels.push('size/large');
+              } else if (changedLines > 100) {
+                labels.push('size/medium');
+              } else {
+                labels.push('size/small');
+              }
+              
+              // Flag for human review if needed
+              if (needsHuman || hasBreakingFiles || changedLines > 300) {
+                labels.push('needs-human-review');
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: number,
+                  body: [
+                    '🚨 **Human Review Required**',
+                    '',
+                    'This PR has been flagged for human attention because:',
+                    needsHuman ? '- Contains high-risk keywords (security, auth, breaking changes, etc.)' : '',
+                    hasBreakingFiles ? '- Modifies sensitive files (migrations, config, auth)' : '',
+                    changedLines > 300 ? `- Large changeset (${changedLines} lines)` : '',
+                    '',
+                    'Please review carefully before merging.',
+                    '',
+                    'cc @BossX429'
+                  ].filter(Boolean).join('\n')
+                });
+              }
+            } else {
+              // Issue triage
+              if (body.includes('bug') || title.toLowerCase().includes('bug')) {
+                labels.push('bug');
+              }
+              if (body.includes('feature') || body.includes('enhancement')) {
+                labels.push('enhancement');
+              }
+              if (body.includes('?') || title.includes('?')) {
+                labels.push('question');
+              }
+              if (needsHuman) {
+                labels.push('needs-human-review');
+              }
+            }
+            
+            // Apply labels
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+                labels: labels
+              });
+            }
