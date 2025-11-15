@@ -1,0 +1,192 @@
+# Auto-Fix Rules for System Monitor Project
+
+# Code formatting rules
+formatting:
+  - name: "black_formatting"
+    enabled: true
+    description: "Auto-format Python code with black"
+    command: "black ."
+    file_patterns:
+      - "**/*.py"
+    auto_apply: true
+    
+  - name: "isort_imports"
+    enabled: true
+    description: "Sort Python imports with isort"
+    command: "isort ."
+    file_patterns:
+      - "**/*.py"
+    auto_apply: true
+
+# Documentation fixes
+documentation:
+  - name: "fix_typos"
+    enabled: true
+    description: "Fix common typos in documentation"
+    file_patterns:
+      - "**/*.md"
+      - "**/*.rst"
+    auto_apply: true
+    common_typos:
+      - ["teh", "the"]
+      - ["recieve", "receive"]
+      - ["seperate", "separate"]
+      - ["occured", "occurred"]
+      - ["consistant", "consistent"]
+      
+  - name: "update_broken_links"
+    enabled: true
+    description: "Fix broken internal links"
+    file_patterns:
+      - "**/*.md"
+    auto_apply: false  # Require review
+    
+# Code quality improvements
+code_quality:
+  - name: "remove_unused_imports"
+    enabled: true
+    description: "Remove unused imports"
+    file_patterns:
+      - "**/*.py"
+    auto_apply: true
+    tool: "autoflake"
+    options:
+      - "--remove-all-unused-imports"
+      - "--in-place"
+      
+  - name: "add_missing_type_hints"
+    enabled: false  # Too risky, require manual review
+    description: "Add missing type hints to function signatures"
+    file_patterns:
+      - "**/*.py"
+    auto_apply: false
+    
+  - name: "fix_docstring_format"
+    enabled: true
+    description: "Fix docstring formatting"
+    file_patterns:
+      - "**/*.py"
+    auto_apply: true
+
+# Security fixes
+security:
+  - name: "remove_print_statements"
+    enabled: true
+    description: "Remove debug print statements from production code"
+    file_patterns:
+      - "**/*.py"
+    exclude_patterns:
+      - "**/tests/**"
+      - "**/examples/**"
+    auto_apply: true
+    pattern: "^\\s*print\\("
+    
+  - name: "fix_hardcoded_credentials"
+    enabled: true
+    description: "Flag hardcoded credentials for review"
+    file_patterns:
+      - "**/*.py"
+      - "**/*.js"
+      - "**/*.yml"
+    auto_apply: false  # Require manual review
+    patterns:
+      - "password\\s*=\\s*['\"][^'\"]+['\"]"
+      - "api_key\\s*=\\s*['\"][^'\"]+['\"]"
+      - "secret\\s*=\\s*['\"][^'\"]+['\"]"
+
+# Dependency updates
+dependencies:
+  - name: "update_patch_versions"
+    enabled: true
+    description: "Auto-update patch version dependencies"
+    file_patterns:
+      - "pyproject.toml"
+      - "requirements.txt"
+    auto_apply: true
+    version_constraint: "patch"
+    
+  - name: "flag_major_updates"
+    enabled: true
+    description: "Flag major version updates for review"
+    file_patterns:
+      - "pyproject.toml"
+      - "requirements.txt"
+    auto_apply: false
+    version_constraint: "major"
+
+# Test improvements
+testing:
+  - name: "add_missing_test_files"
+    enabled: false
+    description: "Create skeleton test files for modules without tests"
+    auto_apply: false
+    
+  - name: "update_test_assertions"
+    enabled: true
+    description: "Update deprecated test assertions"
+    file_patterns:
+      - "**/test_*.py"
+    auto_apply: true
+    replacements:
+      - old: "assertEquals"
+        new: "assertEqual"
+      - old: "assertNotEquals"
+        new: "assertNotEqual"
+
+# File organization
+organization:
+  - name: "add_missing_init"
+    enabled: true
+    description: "Add missing __init__.py files to Python packages"
+    auto_apply: true
+    
+  - name: "update_gitignore"
+    enabled: true
+    description: "Update .gitignore with common Python patterns"
+    auto_apply: true
+    patterns_to_add:
+      - "__pycache__/"
+      - "*.py[cod]"
+      - "*$py.class"
+      - "*.so"
+      - ".Python"
+      - "build/"
+      - "dist/"
+      - ".eggs/"
+      - "*.egg-info/"
+      - ".pytest_cache/"
+      - ".mypy_cache/"
+      - ".coverage"
+      - "htmlcov/"
+
+# Commit message fixes
+commits:
+  - name: "conventional_commits"
+    enabled: true
+    description: "Suggest conventional commit format"
+    auto_apply: false
+    format: "type(scope): subject"
+    types:
+      - feat
+      - fix
+      - docs
+      - style
+      - refactor
+      - test
+      - chore
+
+# Exclusions
+exclusions:
+  paths:
+    - ".git/**"
+    - ".venv/**"
+    - "node_modules/**"
+    - "**/__pycache__/**"
+    - "**/dist/**"
+    - "**/build/**"
+  files:
+    - "*.pyc"
+    - "*.pyo"
+    - "*.pyd"
+    - ".DS_Store"
+    - "Thumbs.db"
