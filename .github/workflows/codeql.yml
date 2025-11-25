@@ -23,7 +23,10 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@afb54ba388a7dca6ecae48f608c4ff05ff4cc77a
         with:
-          languages: ${{ matrix.language }}
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: "python"  # Adjust based on repo
           queries: security-extended,security-and-quality
       - name: Setup language toolchains
         run: |
