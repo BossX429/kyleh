@@ -23,4 +23,3 @@ jobs:
               return;
             }
             await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'squash' });
-'
