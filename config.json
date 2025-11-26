@@ -1,0 +1,35 @@
+{
+  "monitoring": {
+    "interval_seconds": 5,
+    "log_file": "C:\\Projects\\kyleh\\logs\\monitor.log",
+    "enable_gpu": true,
+    "enable_security": true,
+    "enable_optimization": true
+  },
+  "thresholds": {
+    "cpu_warning": 80,
+    "cpu_critical": 95,
+    "ram_warning": 85,
+    "ram_critical": 95,
+    "gpu_temp_warning": 75,
+    "gpu_temp_critical": 85,
+    "gpu_vram_warning": 20000,
+    "gpu_vram_critical": 23000
+  },
+  "optimization": {
+    "auto_optimize": true,
+    "ml_model_path": "C:\\Projects\\kyleh\\models\\optimizer.pkl",
+    "learning_rate": 0.01,
+    "optimization_interval": 300
+  },
+  "security": {
+    "scan_interval": 600,
+    "process_whitelist": [],
+    "alert_on_suspicious": true,
+    "check_network": true
+  },
+  "alerts": {
+    "enable_notifications": true,
+    "critical_only": false
+  }
+}
