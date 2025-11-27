@@ -3,14 +3,13 @@ import os
 import subprocess
 import ctypes
 
-def is_admin() -> bool:
-    """Check if script is running with administrator privileges."""
+def is_admin():
     try:
-        return bool(ctypes.windll.shell32.IsUserAnAdmin())
-    except (OSError, AttributeError):
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
         return False
 
-def install_service() -> None:
+def install_service():
     if not is_admin():
         print("ERROR: This script must be run as Administrator!")
         print("Right-click and select 'Run as administrator'")

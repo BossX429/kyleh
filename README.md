@@ -1,22 +1,21 @@
 # KyleH System Monitor
 
-Real-time Windows system monitor with ML-powered optimization and security scanning.
+Real-time Windows system monitor optimized for high-performance workstations.
+
+**Designed for:**
+- Intel i7-12700K (12 cores, 20 threads)
+- 64GB DDR4 RAM
+- AMD Radeon RX 7900 XTX (24GB VRAM)
+- Windows 11 Pro
 
 ## Features
 
-- Real-time CPU/RAM/GPU monitoring (AMD 7900XTX optimized)
-- ML-powered performance optimization
-- Security threat detection
-- Auto-optimization based on usage patterns
-- Windows service for background operation
-- Detailed logging and alerting
-
-## System Requirements
-
-- Windows 10/11
-- Python 3.10+
-- AMD GPU (optimized for 7900XTX)
-- Admin privileges for service installation
+- **Real-time monitoring**: CPU/RAM/GPU/Disk metrics every 5 seconds
+- **GPU optimization**: AMD 7900XTX specific monitoring with ROCm support
+- **Smart alerts**: Tuned thresholds for high-end hardware
+- **Process protection**: Whitelist for critical apps (Ollama, VSCode, Claude)
+- **Safe by default**: Auto-optimization disabled until you're ready
+- **Detailed logging**: Track system behavior and recommendations
 
 ## Quick Start
 
@@ -24,26 +23,30 @@ Real-time Windows system monitor with ML-powered optimization and security scann
 # Install dependencies
 pip install -r requirements.txt
 
-# Run monitor
-python monitor.py
+# Test components
+python test.py
 
-# Install as Windows service
-python install_service.py
+# Run monitor (safe monitoring mode)
+python monitor.py
 ```
 
-## Architecture
+**Press Ctrl+C to stop**
 
-- `monitor.py` - Main monitoring engine
-- `gpu_monitor.py` - AMD GPU monitoring
-- `ml_optimizer.py` - ML-based optimization
-- `security_scanner.py` - Threat detection
-- `service_wrapper.py` - Windows service wrapper
-- `config.json` - Configuration settings
+## What It Does (Current Config)
 
-## Configuration
+✅ **Active:**
+- Monitors CPU/RAM/GPU/Disk every 5 seconds
+- Logs metrics to `logs\monitor.log`
+- Displays real-time status in console
+- Generates optimization recommendations (logged only)
 
-Edit `config.json` to customize:
-- Monitoring intervals
-- Alert thresholds
-- Optimization aggressiveness
-- Security scan frequency
+❌ **Disabled for safety:**
+- Auto-optimization (won't change process priorities)
+- Security scanning (too many false positives)
+- Memory clearing (until you enable it)
+
+## Documentation
+
+- **[TUNING.md](TUNING.md)** - Hardware-specific configuration explained
+- **[SAFETY.md](SAFETY.md)** - Pre-flight checks and deployment phases
+- **[QUICKSTART.md](QUICKSTART.md)** - Installation and usage guide

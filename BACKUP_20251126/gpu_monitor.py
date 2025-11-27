@@ -1,33 +1,30 @@
 import subprocess
 import re
 import logging
-from typing import Dict, Any
 
 class GPUMonitor:
     """Monitor AMD GPU using rocm-smi or fallback methods"""
     
-    def __init__(self) -> None:
-        self.logger: logging.Logger = logging.getLogger(__name__)
-        self.use_rocm: bool = self.check_rocm_available()
-        self.gpu_name: str = "AMD 7900XTX"
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.use_rocm = self.check_rocm_available()
+        self.gpu_name = "AMD 7900XTX"
         
-    def check_rocm_available(self) -> bool:
-        """Check if ROCm tools are available on the system."""
+    def check_rocm_available(self):
         try:
             result = subprocess.run(['rocm-smi', '--showtemp'], 
                                   capture_output=True, text=True, timeout=5)
             return result.returncode == 0
-        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        except:
             return False
     
-    def get_metrics(self) -> Dict[str, Any]:
-        """Get GPU metrics using available method."""
+    def get_metrics(self):
         if self.use_rocm:
             return self.get_metrics_rocm()
         else:
             return self.get_metrics_fallback()
     
-    def get_metrics_rocm(self) -> Dict[str, Any]:
+    def get_metrics_rocm(self):
         metrics = {
             'name': self.gpu_name,
             'utilization': 0,
@@ -65,7 +62,7 @@ class GPUMonitor:
         
         return metrics
     
-    def get_metrics_fallback(self) -> Dict[str, Any]:
+    def get_metrics_fallback(self):
         """Fallback method using Windows APIs and WMI"""
         metrics = {
             'name': self.gpu_name,
@@ -109,9 +106,8 @@ class GPUMonitor:
         
         return metrics
     
-    def get_vram_percentage(self) -> float:
-        """Calculate VRAM usage percentage."""
+    def get_vram_percentage(self):
         metrics = self.get_metrics()
         if metrics['vram_total_mb'] > 0:
             return (metrics['vram_used_mb'] / metrics['vram_total_mb']) * 100
-        return 0.0
+        return 0

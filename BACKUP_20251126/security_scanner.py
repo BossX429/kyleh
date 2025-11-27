@@ -117,8 +117,7 @@ class SecurityScanner:
             
             if 'NotSigned' in result.stdout:
                 return True
-        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
-            # PowerShell or signature check unavailable
+        except:
             pass
         
         return False

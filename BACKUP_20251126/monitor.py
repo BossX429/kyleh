@@ -5,28 +5,21 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional
 from gpu_monitor import GPUMonitor
 from ml_optimizer import MLOptimizer
 from security_scanner import SecurityScanner
 
 class SystemMonitor:
-    def __init__(self, config_path: str = "config.json") -> None:
-        self.config: Dict[str, Any]
-        self.logger: logging.Logger
-        self.gpu_monitor: Optional[GPUMonitor]
-        self.ml_optimizer: Optional[MLOptimizer]
-        self.security_scanner: Optional[SecurityScanner]
-        self.metrics_history: List[Dict[str, Any]] = []
-        
+    def __init__(self, config_path="config.json"):
         self.load_config(config_path)
         self.setup_logging()
         self.gpu_monitor = GPUMonitor() if self.config["monitoring"]["enable_gpu"] else None
         self.ml_optimizer = MLOptimizer(self.config) if self.config["monitoring"]["enable_optimization"] else None
         self.security_scanner = SecurityScanner(self.config) if self.config["monitoring"]["enable_security"] else None
+        self.metrics_history = []
         
-    def load_config(self, config_path: str) -> None:
-        """Load configuration from JSON file."""
+    def load_config(self, config_path):
+        # Get absolute path relative to script location
         script_dir = Path(__file__).parent
         config_path = script_dir / config_path if not Path(config_path).is_absolute() else Path(config_path)
         
@@ -41,8 +34,7 @@ class SystemMonitor:
         
         os.makedirs(log_file.parent, exist_ok=True)
         
-    def setup_logging(self) -> None:
-        """Setup logging configuration."""
+    def setup_logging(self):
         logging.basicConfig(
             filename=self.config["monitoring"]["log_file"],
             level=logging.INFO,
@@ -50,7 +42,7 @@ class SystemMonitor:
         )
         self.logger = logging.getLogger(__name__)
         
-    def get_system_metrics(self) -> Dict[str, Any]:
+    def get_system_metrics(self):
         metrics = {
             'timestamp': datetime.now().isoformat(),
             'cpu': {
@@ -77,8 +69,7 @@ class SystemMonitor:
             
         return metrics
     
-    def get_cpu_temp(self) -> Optional[float]:
-        """Get CPU temperature using WMI if available."""
+    def get_cpu_temp(self):
         try:
             import wmi
             w = wmi.WMI(namespace="root\\OpenHardwareMonitor")
@@ -86,8 +77,7 @@ class SystemMonitor:
             for sensor in temperature_infos:
                 if sensor.SensorType == 'Temperature' and 'CPU' in sensor.Name:
                     return sensor.Value
-        except (ImportError, Exception) as e:
-            # WMI not available or sensors not accessible
+        except:
             return None
         return None
     

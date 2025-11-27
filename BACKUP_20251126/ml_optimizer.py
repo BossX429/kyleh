@@ -7,22 +7,19 @@ import os
 import logging
 import psutil
 import subprocess
-from typing import Dict, Any, List, Optional
 
 class MLOptimizer:
     """ML-powered system optimization based on usage patterns"""
     
-    def __init__(self, config: Dict[str, Any]) -> None:
-        self.config: Dict[str, Any] = config
-        self.logger: logging.Logger = logging.getLogger(__name__)
-        self.scaler: StandardScaler = StandardScaler()
-        self.model: Optional[RandomForestClassifier] = None
-        self.optimization_history: List[Dict[str, Any]] = []
-        
+    def __init__(self, config):
+        self.config = config
+        self.logger = logging.getLogger(__name__)
+        self.scaler = StandardScaler()
+        self.model = None
         self.load_or_create_model()
+        self.optimization_history = []
         
-    def load_or_create_model(self) -> None:
-        """Load existing ML model or create a new one."""
+    def load_or_create_model(self):
         model_path = self.config["optimization"]["ml_model_path"]
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         
@@ -30,18 +27,16 @@ class MLOptimizer:
             try:
                 self.model = joblib.load(model_path)
                 self.logger.info("Loaded existing ML model")
-            except (IOError, ValueError, EOFError) as e:
-                self.logger.warning(f"Could not load model: {e}")
+            except:
                 self.create_new_model()
         else:
             self.create_new_model()
     
-    def create_new_model(self) -> None:
-        """Create a new Random Forest classifier model."""
+    def create_new_model(self):
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.logger.info("Created new ML model")
     
-    def extract_features(self, metrics: Dict[str, Any]) -> List[float]:
+    def extract_features(self, metrics):
         features = [
             metrics['cpu']['avg'],
             metrics['ram']['percent'],

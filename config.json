@@ -1,32 +1,50 @@
 {
   "monitoring": {
     "interval_seconds": 5,
-    "log_file": "C:\\Projects\\kyleh\\logs\\monitor.log",
+    "log_file": "logs\\monitor.log",
     "enable_gpu": true,
-    "enable_security": true,
+    "enable_security": false,
     "enable_optimization": true
   },
   "thresholds": {
-    "cpu_warning": 80,
-    "cpu_critical": 95,
-    "ram_warning": 85,
-    "ram_critical": 95,
-    "gpu_temp_warning": 75,
-    "gpu_temp_critical": 85,
+    "cpu_warning": 85,
+    "cpu_critical": 98,
+    "ram_warning": 90,
+    "ram_critical": 97,
+    "gpu_temp_warning": 80,
+    "gpu_temp_critical": 90,
     "gpu_vram_warning": 20000,
     "gpu_vram_critical": 23000
   },
   "optimization": {
-    "auto_optimize": true,
-    "ml_model_path": "C:\\Projects\\kyleh\\models\\optimizer.pkl",
+    "auto_optimize": false,
+    "ml_model_path": "models\\optimizer.pkl",
     "learning_rate": 0.01,
-    "optimization_interval": 300
+    "optimization_interval": 300,
+    "process_whitelist": [
+      "ollama.exe",
+      "ollama_llama_server.exe",
+      "python.exe",
+      "pythonw.exe",
+      "Code.exe",
+      "claude.exe",
+      "msedge.exe",
+      "chrome.exe",
+      "nvidia-smi.exe",
+      "rocm-smi.exe"
+    ]
   },
   "security": {
     "scan_interval": 600,
-    "process_whitelist": [],
+    "process_whitelist": [
+      "python.exe",
+      "pythonw.exe",
+      "ollama.exe",
+      "Code.exe",
+      "claude.exe"
+    ],
     "alert_on_suspicious": true,
-    "check_network": true
+    "check_network": false
   },
   "alerts": {
     "enable_notifications": true,
