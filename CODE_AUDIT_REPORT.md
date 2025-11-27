@@ -23,7 +23,7 @@
 
 ## CRITICAL ISSUES
 
-### 1. BARE EXCEPT CLAUSES (5 instances) ⚠️
+### 1. BARE EXCEPT CLAUSES (5 instances) ️
 **Severity:** MEDIUM  
 **Impact:** Silent failures, hard to debug
 
@@ -55,7 +55,7 @@ except (OSError, AttributeError):  # GOOD - specific exceptions
 
 ---
 
-### 2. MISSING TYPE HINTS (Multiple methods) ⚠️
+### 2. MISSING TYPE HINTS (Multiple methods) ️
 **Severity:** LOW-MEDIUM  
 **Impact:** Limited IDE support, no type safety
 
@@ -66,7 +66,7 @@ except (OSError, AttributeError):  # GOOD - specific exceptions
 
 ---
 
-### 3. GIT UNCOMMITTED CHANGES ⚠️
+### 3. GIT UNCOMMITTED CHANGES ️
 **Severity:** LOW  
 **Impact:** GitHub is out of sync
 
@@ -76,7 +76,7 @@ except (OSError, AttributeError):  # GOOD - specific exceptions
 
 ---
 
-## POSITIVE FINDINGS ✅
+## POSITIVE FINDINGS 
 
 ### Well-Structured Code
 - Clear separation of concerns (monitor, GPU, ML, security modules)

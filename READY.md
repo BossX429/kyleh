@@ -1,4 +1,4 @@
-# ✅ KyleH System Monitor - FIXED AND TUNED
+#  KyleH System Monitor - FIXED AND TUNED
 
 ## Status: READY FOR USE
 
@@ -6,14 +6,14 @@ All critical issues have been fixed and the system is tuned for your hardware.
 
 ## What Was Done
 
-### 🛡️ Safety Fixes
+### ️ Safety Fixes
 - **Auto-optimization**: DISABLED by default (won't throttle your processes)
 - **Security scanner**: DISABLED (was too noisy)
 - **Process whitelist**: Added (Ollama, Python, VSCode, Claude protected)
 - **Memory clearing**: Fixed (now uses proper Windows API)
 - **Paths**: Fixed (no more hardcoded C:\ paths)
 
-### ⚙️ Performance Tuning
+### ️ Performance Tuning
 Your system: Intel i7-12700K + 64GB RAM + AMD 7900XTX
 
 **Thresholds optimized:**
@@ -21,7 +21,7 @@ Your system: Intel i7-12700K + 64GB RAM + AMD 7900XTX
 - RAM: 90% warning / 97% critical (tuned for 64GB)
 - GPU: 80°C warning / 90°C critical (7900XTX safe range)
 
-### 📋 Protected Processes
+###  Protected Processes
 These will NEVER be throttled:
 ```
 ollama.exe, ollama_llama_server.exe, python.exe, pythonw.exe,
@@ -37,11 +37,11 @@ python monitor.py
 ```
 
 **What it does:**
-- ✅ Monitors CPU/RAM/GPU/Disk every 5 seconds
-- ✅ Logs everything to `logs\monitor.log`
-- ✅ Shows real-time status in console
-- ✅ Generates recommendations (logged only)
-- ❌ Won't auto-optimize (you're in control)
+-  Monitors CPU/RAM/GPU/Disk every 5 seconds
+-  Logs everything to `logs\monitor.log`
+-  Shows real-time status in console
+-  Generates recommendations (logged only)
+-  Won't auto-optimize (you're in control)
 
 ### What You'll See
 ```
@@ -65,17 +65,17 @@ GPU: 12.0% | Temp: 64.0C | VRAM: 4096MB/24576MB
 
 ```
 Testing monitor initialization...
-✓ Monitor initialized successfully
-✓ CPU: 13.1%
-✓ RAM: 21.9% (14.0GB/63.7GB)
-✓ GPU: 0.0% @ 0.0C
+ Monitor initialized successfully
+ CPU: 13.1%
+ RAM: 21.9% (14.0GB/63.7GB)
+ GPU: 0.0% @ 0.0C
 
 Configuration:
   Auto-optimize: False
   Security scan: False
   Whitelisted processes: 10
 
-✓ All systems operational!
+ All systems operational!
 ```
 
 **Note:** GPU shows 0.0C/0.0% because WMI/GPUtil aren't installed. 
@@ -83,22 +83,22 @@ If you have ROCm installed, it will show real values.
 
 ## Documentation Guide
 
-📖 **[TUNING.md](TUNING.md)** - Understanding your configuration
+ **[TUNING.md](TUNING.md)** - Understanding your configuration
 - Why thresholds are set this way
 - How to adjust for your workload
 - Performance expectations
 
-🛡️ **[SAFETY.md](SAFETY.md)** - Deployment checklist
+️ **[SAFETY.md](SAFETY.md)** - Deployment checklist
 - What's safe to enable now
 - Testing phases before going live
 - Emergency recovery procedures
 
-📝 **[CHANGES.md](CHANGES.md)** - What was fixed
+ **[CHANGES.md](CHANGES.md)** - What was fixed
 - Complete list of fixes applied
 - Before/after comparison
 - Why each change was made
 
-🚀 **[QUICKSTART.md](QUICKSTART.md)** - Basic usage
+ **[QUICKSTART.md](QUICKSTART.md)** - Basic usage
 - Installation steps
 - Service management
 - Troubleshooting tips
@@ -106,7 +106,7 @@ If you have ROCm installed, it will show real values.
 ## Next Steps
 
 ### Phase 1: Monitor Only (Now - Next 24hrs)
-✅ **Current state - Safe to use**
+ **Current state - Safe to use**
 1. Run: `python monitor.py`
 2. Let it run for a few hours
 3. Watch the console output
@@ -114,20 +114,20 @@ If you have ROCm installed, it will show real values.
 5. Verify alerts make sense
 
 ### Phase 2: Review & Tune (After 24hrs)
-⚠️ **Review first**
+️ **Review first**
 1. Check optimization recommendations in logs
 2. See if any important processes were flagged
 3. Add more processes to whitelist if needed
 4. Adjust thresholds if getting false alerts
 
 ### Phase 3: Enable Auto-Optimization (Optional)
-⚠️ **Only if comfortable**
+️ **Only if comfortable**
 1. Edit `config.json`: `"auto_optimize": true`
 2. Monitor for another 24-48 hours
 3. Verify no important processes get throttled
 4. Keep watching logs
 
 ### Phase 4: Service Installation (When stable)
-⚠️ **For 24/7 monitoring**
+️ **For 24/7 monitoring**
 1. Test in console mode is stable first
 2. Run: `python install_service.py` (as Admin)

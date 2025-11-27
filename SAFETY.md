@@ -1,6 +1,6 @@
 # Safety Checklist - Before Deploying
 
-## ✓ Fixed Issues
+##  Fixed Issues
 
 ### Critical Fixes Applied
 - [x] **Auto-optimization DISABLED** - Won't automatically throttle processes
@@ -128,17 +128,17 @@ python monitor.py
 
 ## What's Safe to Enable Now
 
-✅ **Safe to use immediately:**
+ **Safe to use immediately:**
 - Monitoring (CPU/RAM/GPU/Disk)
 - Threshold alerts
 - Logging to file
 - Console output
 
-⚠️ **Test first (current state):**
+️ **Test first (current state):**
 - Optimization recommendations (logged only)
 - Process whitelist (verify coverage)
 
-❌ **Keep disabled:**
+ **Keep disabled:**
 - Auto-optimization (until tested)
 - Security scanning (too noisy)
 - Network monitoring (false positives)

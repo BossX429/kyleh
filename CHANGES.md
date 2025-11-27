@@ -7,9 +7,9 @@ Applied on: November 26, 2025
 ### Configuration Changes (config.json)
 
 **Safety Improvements:**
-- ✓ Disabled auto-optimization (`"auto_optimize": false`)
-- ✓ Disabled security scanning (`"enable_security": false`)
-- ✓ Changed to relative paths (no hardcoded C:\\ paths)
+-  Disabled auto-optimization (`"auto_optimize": false`)
+-  Disabled security scanning (`"enable_security": false`)
+-  Changed to relative paths (no hardcoded C:\\ paths)
 
 **Threshold Tuning for 64GB / 7900XTX:**
 - CPU Warning: 80% → **85%** (higher threshold for 12700K)
@@ -29,22 +29,22 @@ These processes will never be throttled by optimizer.
 ### Code Fixes
 
 **ml_optimizer.py:**
-1. ✓ Added whitelist checking before lowering process priorities
-2. ✓ Fixed memory clearing - now uses Windows kernel32 API
-3. ✓ Added RAMMap fallback if API unavailable
-4. ✓ Better error handling and logging
+1.  Added whitelist checking before lowering process priorities
+2.  Fixed memory clearing - now uses Windows kernel32 API
+3.  Added RAMMap fallback if API unavailable
+4.  Better error handling and logging
 
 **monitor.py:**
-1. ✓ Fixed path handling - now works with relative paths
-2. ✓ Automatically resolves paths relative to script location
-3. ✓ Creates log directory if missing
+1.  Fixed path handling - now works with relative paths
+2.  Automatically resolves paths relative to script location
+3.  Creates log directory if missing
 
 **security_scanner.py:**
-1. ✓ Removed outdated threats (WannaCry, Cryptolocker)
-2. ✓ Raised CPU threshold: 80% → 90% (less false positives)
-3. ✓ Added baseline tracking for high CPU processes
-4. ✓ Respects whitelist properly
-5. ✓ Better severity classification
+1.  Removed outdated threats (WannaCry, Cryptolocker)
+2.  Raised CPU threshold: 80% → 90% (less false positives)
+3.  Added baseline tracking for high CPU processes
+4.  Respects whitelist properly
+5.  Better severity classification
 
 ### New Documentation
 
@@ -91,20 +91,20 @@ These processes will never be throttled by optimizer.
 ## Before vs After
 
 ### Before (Unsafe)
-- ❌ Auto-throttled processes without whitelist
-- ❌ Could interfere with Ollama/VSCode/Claude
-- ❌ Memory clearing used fake PowerShell cmdlet
-- ❌ Security scanner too noisy (WannaCry checks)
-- ❌ Conservative thresholds (false alarms)
-- ❌ Hardcoded paths (wouldn't work elsewhere)
+-  Auto-throttled processes without whitelist
+-  Could interfere with Ollama/VSCode/Claude
+-  Memory clearing used fake PowerShell cmdlet
+-  Security scanner too noisy (WannaCry checks)
+-  Conservative thresholds (false alarms)
+-  Hardcoded paths (wouldn't work elsewhere)
 
 ### After (Safe)
-- ✅ Whitelist protects your critical apps
-- ✅ Auto-optimization disabled by default
-- ✅ Memory clearing uses proper Windows API
-- ✅ Security scanner disabled (optional enable)
-- ✅ Thresholds tuned for 64GB/7900XTX
-- ✅ Relative paths work from anywhere
+-  Whitelist protects your critical apps
+-  Auto-optimization disabled by default
+-  Memory clearing uses proper Windows API
+-  Security scanner disabled (optional enable)
+-  Thresholds tuned for 64GB/7900XTX
+-  Relative paths work from anywhere
 
 ## Testing the Changes
 

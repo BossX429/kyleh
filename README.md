@@ -34,13 +34,13 @@ python monitor.py
 
 ## What It Does (Current Config)
 
-✅ **Active:**
+ **Active:**
 - Monitors CPU/RAM/GPU/Disk every 5 seconds
 - Logs metrics to `logs\monitor.log`
 - Displays real-time status in console
 - Generates optimization recommendations (logged only)
 
-❌ **Disabled for safety:**
+ **Disabled for safety:**
 - Auto-optimization (won't change process priorities)
 - Security scanning (too many false positives)
 - Memory clearing (until you enable it)
