@@ -1,0 +1,120 @@
+name: Unicode Character Check
+
+on:
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.md'
+      - '**.txt'
+      - '**.js'
+      - '**.json'
+      - '**.yml'
+      - '**.yaml'
+  workflow_dispatch:
+
+jobs:
+  check-unicode:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Find Unicode characters
+      id: unicode-check
+      run: |
+        echo "## Unicode Character Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        python3 tools/find_unicode.py --detailed --max-files 10 > unicode_report.txt 2>&1
+        
+        # Extract summary
+        echo "### Summary" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        grep -A 3 "UNICODE CHARACTER SUMMARY" unicode_report.txt >> $GITHUB_STEP_SUMMARY || true
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        
+        # Check for suspicious Unicode (invisible characters, look-alikes)
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Security Check" >> $GITHUB_STEP_SUMMARY
+        
+        # Look for potentially dangerous Unicode
+        SUSPICIOUS=$(grep -E "ZERO WIDTH|VARIATION SELECTOR|RIGHT-TO-LEFT|LEFT-TO-RIGHT" unicode_report.txt || true)
+        
+        if [ -n "$SUSPICIOUS" ]; then
+          echo "⚠️ **Warning: Suspicious Unicode characters detected**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$SUSPICIOUS" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "suspicious_found=true" >> $GITHUB_OUTPUT
+        else
+          echo "✅ No suspicious Unicode characters found" >> $GITHUB_STEP_SUMMARY
+          echo "suspicious_found=false" >> $GITHUB_OUTPUT
+        fi
+        
+        # Attach full report
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Full Report" >> $GITHUB_STEP_SUMMARY
+        echo "<details><summary>Click to expand detailed report</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        head -100 unicode_report.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "</details>" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Upload report artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: unicode-report
+        path: unicode_report.txt
+        retention-days: 30
+    
+    - name: Comment on PR with summary
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('unicode_report.txt', 'utf8');
+          
+          // Extract key metrics
+          const filesMatch = report.match(/Total files with Unicode: (\d+)/);
+          const linesMatch = report.match(/Total lines with Unicode: (\d+)/);
+          const charsMatch = report.match(/Unique Unicode characters: (\d+)/);
+          
+          const files = filesMatch ? filesMatch[1] : 'N/A';
+          const lines = linesMatch ? linesMatch[1] : 'N/A';
+          const chars = charsMatch ? charsMatch[1] : 'N/A';
+          
+          const suspicious = '${{ steps.unicode-check.outputs.suspicious_found }}' === 'true';
+          
+          const body = `## 🔍 Unicode Character Check
+          
+          **Summary:**
+          - Files with Unicode: ${files}
+          - Lines with Unicode: ${lines}
+          - Unique characters: ${chars}
+          
+          ${suspicious ? '⚠️ **Suspicious Unicode detected** - Please review the workflow summary' : '✅ No suspicious Unicode found'}
+          
+          📄 Full report available in workflow artifacts
+          📚 See [UNICODE_CHARACTERS.md](../blob/main/UNICODE_CHARACTERS.md) for guidelines
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });
+    
+    - name: Fail on suspicious Unicode
+      if: steps.unicode-check.outputs.suspicious_found == 'true'
+      run: |
+        echo "::error::Suspicious Unicode characters detected. Please review and remove them."
+        exit 1
