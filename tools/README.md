@@ -262,8 +262,19 @@ When adding new Unicode characters to the repository:
 3. Test with `test_unicode_support.py`
 4. Add mappings to `unicode_to_ascii.py` if appropriate
 
+## More Examples
+
+See [EXAMPLES.md](EXAMPLES.md) for:
+- Detailed usage examples and scenarios
+- Batch operation scripts
+- CI/CD integration examples
+- Troubleshooting guides
+- Custom mapping examples
+- Performance optimization tips
+
 ## References
 
+- [EXAMPLES.md](EXAMPLES.md) - Detailed usage examples and scenarios
 - [UNICODE_CHARACTERS.md](../UNICODE_CHARACTERS.md) - Full Unicode usage documentation
 - [Unicode Standard](https://unicode.org/)
 - [Python Unicode HOWTO](https://docs.python.org/3/howto/unicode.html)
